@@ -1,4 +1,4 @@
-module Unread
+module UnreadMongoid
   module Reader
     module InstanceMethods
       def read_mark_global(klass)

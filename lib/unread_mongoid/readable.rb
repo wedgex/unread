@@ -1,4 +1,4 @@
-module Unread
+module UnreadMongoid
   module Readable
     module ClassMethods
       def mark_as_read!(target, options)
@@ -95,18 +95,7 @@ module Unread
 
     module InstanceMethods
       def unread?(user)
-        if self.respond_to?(:read_mark_id)
-          # For use with scope "with_read_marks_for"
-          return false if self.read_mark_id
-
-          if global_timestamp = user.read_mark_global(self.class).try(:timestamp)
-            self.send(readable_options[:on]) > global_timestamp
-          else
-            true
-          end
-        else
-          self.class.read_mark_ids(user).none? { |i| i == self._id }
-        end
+        self.class.unread_by(user).and(_id: self._id).exists?
       end
 
       def mark_as_read!(options)

@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "unread/version"
+require "unread_mongoid/version"
 
 Gem::Specification.new do |s|
   s.name        = "unread-mongoid"
-  s.version     = Unread::VERSION
+  s.version     = UnreadMongoid::VERSION
   s.authors     = ["Hunter Haydel", "Georg Ledermann"]
   s.email       = ["haydh530@gmail.com"]
   s.homepage    = ""

@@ -1,4 +1,4 @@
-module Unread
+module UnreadMongoid
   def self.included(base)
     base.extend Base
   end

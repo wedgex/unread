@@ -5,11 +5,11 @@ require 'timecop'
 ENV['MONGOID_ENV'] = 'test'
 Mongoid.load!(File.dirname(__FILE__) + '/mongoid.yml')
 
-require 'unread'
+require 'unread_mongoid'
 
 class Reader
   include Mongoid::Document
-  include Unread
+  include UnreadMongoid
 
   acts_as_reader
 
@@ -20,7 +20,7 @@ class Email
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  include Unread
+  include UnreadMongoid
 
   acts_as_readable :on => :updated_at
 

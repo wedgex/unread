@@ -40,18 +40,18 @@ bundle
 ## Usage
 
 ```ruby
-class User < ActiveRecord::Base
+class User
   include Mongoid::Document
-  include Unread
+  include UnreadMongoid
 
   acts_as_reader
 end
 
-class Message < ActiveRecord::Base
+class Message
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  include Unread
+  include UnreadMongoid
   acts_as_readable :on => :created_at
 end
 
