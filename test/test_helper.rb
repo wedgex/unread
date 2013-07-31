@@ -1,24 +1,31 @@
 require 'test/unit'
-require 'active_support'
-require 'active_support/test_case'
-require 'active_record'
+require 'mongoid'
 require 'timecop'
 
-configs = YAML.load_file(File.dirname(__FILE__) + '/database.yml')
-ActiveRecord::Base.configurations = configs
-
-ActiveRecord::Base.establish_connection('sqlite')
-ActiveRecord::Migration.verbose = false
-load(File.dirname(__FILE__) + "/schema.rb")
+ENV['MONGOID_ENV'] = 'test'
+Mongoid.load!(File.dirname(__FILE__) + '/mongoid.yml')
 
 require 'unread'
 
-class Reader < ActiveRecord::Base
+class Reader
+  include Mongoid::Document
+  include Unread
+
   acts_as_reader
+
+  field :name, type: String
 end
 
-class Email < ActiveRecord::Base
+class Email
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  include Unread
+
   acts_as_readable :on => :updated_at
+
+  field :subject, type: String
+  field :content, type: String
 end
 
-puts "Testing with ActiveRecord #{ActiveRecord::VERSION::STRING}"
+puts "Testing with Mongoid #{Mongoid::VERSION}"

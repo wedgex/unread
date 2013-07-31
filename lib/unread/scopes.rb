@@ -1,28 +1,36 @@
 module Unread
   module Readable
     module Scopes
-      def join_read_marks(user)
+      # TODO rename some of these
+      def read_marks_for(user)
         assert_reader(user)
 
-        joins "LEFT JOIN read_marks ON read_marks.readable_type  = '#{base_class.name}'
-                                   AND read_marks.readable_id    = #{table_name}.id
-                                   AND read_marks.user_id        = #{user.id}
-                                   AND read_marks.timestamp     >= #{table_name}.#{readable_options[:on]}"
+        ReadMark.where(readable_type: self.name, user_id: user._id)
+      end
+
+      def read_mark_ids(user)
+        ids = read_marks_for(user).ne(readable_id: nil).only(:readable_id).map(&:readable_id)
+        ids += blanket_read_for_ids(user)
+
+        ids
+      end
+
+      def blanket_read_for_ids(user)
+        blanket = read_marks_for(user).where(readable_id: nil).sort(timestamp: :desc).first
+
+        if blanket
+          self.lte(self.readable_options[:on] => blanket.timestamp).only(:_id).map(&:_id)
+        else
+          []
+        end
       end
 
       def unread_by(user)
-        result = join_read_marks(user).
-                 where('read_marks.id IS NULL')
-
-        if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result = result.where("#{table_name}.#{readable_options[:on]} > '#{global_time_stamp.to_s(:db)}'")
-        end
-
-        result
+        self.not_in(_id: read_mark_ids(user))
       end
 
-      def with_read_marks_for(user)
-        join_read_marks(user).select("#{table_name}.*, read_marks.id AS read_mark_id")
+      def read_by(user)
+        self.in(_id: read_mark_ids(user))
       end
     end
   end

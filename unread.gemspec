@@ -3,24 +3,21 @@ $:.push File.expand_path("../lib", __FILE__)
 require "unread/version"
 
 Gem::Specification.new do |s|
-  s.name        = "unread"
+  s.name        = "unread-mongoid"
   s.version     = Unread::VERSION
-  s.authors     = ["Georg Ledermann"]
-  s.email       = ["mail@georg-ledermann.de"]
+  s.authors     = ["Hunter Haydel", "Georg Ledermann"]
+  s.email       = ["haydh530@gmail.com"]
   s.homepage    = ""
-  s.summary     = %q{Manages read/unread status of ActiveRecord objects}
+  s.summary     = %q{Manages read/unread status of Mongoid objects}
   s.description = %q{This gem creates a scope for unread objects and adds methods to mark objects as read }
-
-  s.rubyforge_project = "unread"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency 'activerecord', '>= 3'
+  s.add_dependency 'mongoid', '~> 3.1.0'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'timecop'
-  s.add_development_dependency 'sqlite3'
 end

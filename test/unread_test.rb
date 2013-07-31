@@ -4,6 +4,7 @@ class UnreadTest < ActiveSupport::TestCase
   def setup
     @reader = Reader.create! :name => 'David'
     @other_reader = Reader.create :name => 'Matz'
+
     wait
     @email1 = Email.create!
     wait
@@ -37,27 +38,36 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal 2, Email.unread_by(@other_reader).count
   end
 
-  def test_with_read_marks_for
+  def test_read_by
     @email1.mark_as_read! :for => @reader
 
-    emails = Email.with_read_marks_for(@reader).to_a
-
-    assert emails[0].read_mark_id.present?
-    assert emails[1].read_mark_id.nil?
-
-    assert_equal false, emails[0].unread?(@reader)
-    assert_equal true, emails[1].unread?(@reader)
+    assert_equal [@email1], Email.read_by(@reader).entries
   end
+
+  #def test_with_read_marks_for
+    #@email1.mark_as_read! :for => @reader
+
+    #emails = Email.with_read_marks_for(@reader).entries
+
+    #assert emails[0].read_mark_id.present?
+    #assert emails[1].read_mark_ids.nil?
+
+    #assert_equal false, emails[0].unread?(@reader)
+    #assert_equal true, emails[1].unread?(@reader)
+  #end
 
   def test_scope_param_check
     [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
-      assert_raise(ArgumentError) { Email.unread_by(not_a_reader)}
-      assert_raise(ArgumentError) { Email.with_read_marks_for(not_a_reader)}
+      assert_raise(ArgumentError) { Email.unread_by(not_a_reader) }
+      assert_raise(ArgumentError) { Email.read_by(not_a_reader) }
     end
 
+    # gonna keep this, but not really likely in mongoid
     unsaved_reader = Reader.new
-    assert_raise(ArgumentError) { Email.unread_by(unsaved_reader)}
-    assert_raise(ArgumentError) { Email.with_read_marks_for(unsaved_reader)}
+    unsaved_reader._id = nil
+
+    assert_raise(ArgumentError) { Email.unread_by(unsaved_reader) }
+    assert_raise(ArgumentError) { Email.read_by(unsaved_reader) }
   end
 
   def test_scope_after_reset
@@ -85,13 +95,13 @@ class UnreadTest < ActiveSupport::TestCase
   end
 
   def test_mark_as_read
-    @email1.mark_as_read! :for => @reader
+    @email1.mark_as_read!(:for => @reader)
 
     assert_equal false, @email1.unread?(@reader)
-    assert_equal [@email2], Email.unread_by(@reader)
+    assert_equal [@email2], Email.unread_by(@reader).entries
 
     assert_equal true, @email1.unread?(@other_reader)
-    assert_equal [@email1, @email2], Email.unread_by(@other_reader)
+    assert_equal [@email1, @email2], Email.unread_by(@other_reader).entries
 
     assert_equal 1, @reader.read_marks.single.count
     assert_equal @email1, @reader.read_marks.single.first.readable
@@ -113,7 +123,7 @@ class UnreadTest < ActiveSupport::TestCase
     Email.mark_as_read! :all, :for => @reader
     @email1.mark_as_read! :for => @reader
 
-    assert_equal [], @reader.read_marks.single
+    assert_equal [], @reader.read_marks.single.entries
   end
 
   def test_mark_as_read_twice
@@ -137,7 +147,7 @@ class UnreadTest < ActiveSupport::TestCase
 
     @email1.mark_as_read! :for => @reader
 
-    assert_equal [@email2], Email.unread_by(@reader)
+    assert_equal [@email2], Email.unread_by(@reader).entries
     assert_equal 1, @reader.read_marks.single.count
 
     Email.cleanup_read_marks!
@@ -149,7 +159,7 @@ class UnreadTest < ActiveSupport::TestCase
   def test_cleanup_read_marks_not_delete_from_other_readables
     other_read_mark = @reader.read_marks.create! :readable_type => 'Foo', :readable_id => 42, :timestamp => 5.years.ago
     Email.cleanup_read_marks!
-    assert_equal true, !!ReadMark.exists?(other_read_mark.id) # Rails4 does not return true, but count instead.
+    assert_equal true, ReadMark.where(_id: other_read_mark._id).exists?
   end
 
   def test_reset_read_marks_for_all
