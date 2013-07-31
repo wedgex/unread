@@ -1,4 +1,4 @@
-module Unread
+module UnreadMongoid
   def self.included(base)
     base.extend Base
   end
@@ -24,7 +24,6 @@ module Unread
     def acts_as_readable(options={})
       class_attribute :readable_options
 
-      options.reverse_merge!(:on => :updated_at)
       self.readable_options = options
 
       has_many :read_marks, :as => :readable, :dependent => :delete_all
