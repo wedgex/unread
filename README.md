@@ -4,7 +4,7 @@ Unread-Mongoid
 Ruby gem to manage read/unread status of Mongoid objects.
 
 ## Credit
-First and foremost this is a fork of [Unread](https://github.com/ledermann/unread) by [Georg Ledermann](http://www.georg-ledermann.de). If you don't need to use Mongoid I highly reccoment you use his gem, this is a task much better suited to a relational db, I had to remove some features to make it work for Mongoid.
+First and foremost this is a fork of [Unread](https://github.com/ledermann/unread) by [Georg Ledermann](http://www.georg-ledermann.de). If you don't have to use Mongo for this I highly reccoment you use his gem, this is a task much better suited to a relational db, I had to remove some features to make it work for Mongoid.
 
 ## Features
 
