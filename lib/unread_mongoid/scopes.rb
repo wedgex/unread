@@ -37,7 +37,12 @@ module UnreadMongoid
       end
 
       def specifically_marked_ids(user)
-        read_marks_query(user).ne(readable_id: nil).only(:readable_id).map(&:readable_id)
+        time_comparison = "this.timestamp >= this.readable_timestamp"
+
+        read_marks_query(user).ne(readable_id: nil)
+          .for_js(time_comparison)
+          .only(:readable_id)
+          .map(&:readable_id)
       end
     end
   end
