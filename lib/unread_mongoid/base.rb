@@ -28,6 +28,14 @@ module UnreadMongoid
 
       has_many :read_marks, :as => :readable, :dependent => :delete_all
 
+      # :(
+      after_save do |doc|
+        doc.read_marks.each do |mark|
+          mark.readable_timestamp = doc.readable_timestamp
+          mark.save!
+        end
+      end
+
       ReadMark.readable_classes ||= []
       ReadMark.readable_classes << self unless ReadMark.readable_classes.include?(self)
 
