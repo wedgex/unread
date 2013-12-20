@@ -17,6 +17,11 @@ class UnreadTest < ActiveSupport::TestCase
     ReadMark.delete_all
     Timecop.return
   end
+  
+  def can_run_on_mongoid3_4
+    assert Mongoid::VERSION >= "3.0"
+    assert Mongoid::VERSION <= "4.0"
+  end 
 
   def test_schema_has_loaded_correctly
     assert_equal [@email1, @email2], Email.all
