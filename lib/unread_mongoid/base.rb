@@ -7,7 +7,7 @@ module UnreadMongoid
     def acts_as_reader
       ReadMark.belongs_to :user, :class_name => self.to_s
 
-      has_many :read_marks, :dependent => :delete_all, :foreign_key => 'user_id', :inverse_of => :user
+      has_many :read_marks, :dependent => :destroy, :foreign_key => 'user_id', :inverse_of => :user
 
       after_create do |user|
         # We assume that a new user should not be tackled by tons of old messages
@@ -26,7 +26,7 @@ module UnreadMongoid
 
       self.readable_options = options
 
-      has_many :read_marks, :as => :readable, :dependent => :delete_all
+      has_many :read_marks, :as => :readable, :dependent => :destroy
 
       # :(
       after_save do |doc|

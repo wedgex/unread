@@ -169,6 +169,13 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal 2, ReadMark.global.count
   end
 
+  def test_destroys_readmarks_when_readable_is_destroyed
+    count = ReadMark.count
+    @email1.mark_as_read! for: @reader
+    assert_equal count + 1, ReadMark.count
+    @email1.destroy
+    assert_equal count, ReadMark.count
+  end
 private
   def wait
     Timecop.freeze(1.minute.from_now.change(:usec => 0))
