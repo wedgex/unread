@@ -106,11 +106,9 @@ module UnreadMongoid
         user = options[:for]
         self.class.assert_reader(user)
 
-        if unread?(user)
-          rm = read_mark(user) || read_marks.build(:user_id => user._id)
-          rm.timestamp = self.send(readable_options[:on]).to_s(:db)
-          rm.save!
-        end
+        rm = read_mark(user) || read_marks.build(:user_id => user._id)
+        rm.timestamp = self.send(readable_options[:on]).to_s(:db)
+        rm.save!
       end
 
       def read_mark(user)
