@@ -2,7 +2,6 @@ class ReadMark
   include Mongoid::Document
 
   field :timestamp, type: Time
-  field :readable_timestamp, type: Time, default: -> { readable.readable_timestamp if readable }
 
   belongs_to :readable, :polymorphic => true
   belongs_to :user
