@@ -94,10 +94,6 @@ module UnreadMongoid
     end
 
     module InstanceMethods
-      def readable_timestamp
-        self.send(readable_options[:on]).to_s(:db)
-      end
-
       def unread?(user)
         self.class.unread_by(user).and(_id: self._id).exists?
       end
