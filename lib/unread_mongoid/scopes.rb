@@ -38,7 +38,7 @@ module UnreadMongoid
 
       def specifically_marked_ids(user)
         read_marks_query(user).ne(readable_id: nil).select do |read_mark|
-          read_mark.timestamp >= read_mark.readable.send(self.readable_options[:on])
+          read_mark.timestamp.to_i >= read_mark.readable.send(self.readable_options[:on]).to_i
         end.map(&:readable_id)
       end
     end
