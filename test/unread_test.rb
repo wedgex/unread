@@ -96,6 +96,47 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal [], Email.unread_by(@reader)
   end
 
+  def test_destroys_readmarks_when_readable_is_destroyed
+    @email1.mark_as_read! for: @reader
+
+    assert_equal 1, ReadMark.count
+
+    @email1.destroy
+
+    assert_equal 0, ReadMark.count
+  end
+
+  def test_destroys_readmarks_when_reader_is_destroyed
+    @email1.mark_as_read! for: @reader
+
+    assert_equal 1, ReadMark.count
+
+    @reader.destroy
+
+    assert_equal 0, ReadMark.count
+  end
+
+  def test_does_not_destroy_readable_when_readmark_is_destroyed
+    email_id = @email1.id
+
+    @email1.mark_as_read! for: @reader
+
+    ReadMark.destroy_all
+
+    assert_equal 0, ReadMark.count
+    assert_equal 1, Email.where(id: email_id).count
+  end
+
+  def test_does_not_destroy_reader_when_readmark_is_destroyed
+    reader_id = @reader
+
+    @email1.mark_as_read! for: @reader
+
+    ReadMark.destroy_all
+
+    assert_equal 0, ReadMark.count
+    assert_equal 1, User.where(id: reader_id).count
+  end
 private
   def wait
     Timecop.freeze(1.minute.from_now.change(:usec => 0))

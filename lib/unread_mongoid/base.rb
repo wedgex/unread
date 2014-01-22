@@ -5,11 +5,13 @@ module UnreadMongoid
 
   module Base
     def acts_as_reader
+      has_many :read_marks, as: :reader, dependent: :destroy
+
       include Reader
     end
 
     def acts_as_readable
-      has_many :read_marks, as: :readable
+      has_many :read_marks, as: :readable, dependent: :destroy
 
       before_save do |readable|
         readable.read_marks.delete_all
