@@ -137,6 +137,15 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal 0, ReadMark.count
     assert_equal 1, User.where(id: reader_id).count
   end
+
+  def test_mark_as_unread_sets_readable_back_to_unread
+    @email1.mark_as_read! for: @reader
+    assert_equal false, @email1.unread?(@reader)
+
+    @email1.mark_as_unread!
+
+    assert_equal true, @email1.unread?(@reader)
+  end
 private
   def wait
     Timecop.freeze(1.minute.from_now.change(:usec => 0))

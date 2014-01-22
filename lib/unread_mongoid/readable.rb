@@ -32,6 +32,10 @@ module UnreadMongoid
 
         ReadMark.create(reader: reader, readable: self)
       end
+
+      def mark_as_unread!
+        self.read_marks.destroy_all
+      end
     end
   end
 end

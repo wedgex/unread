@@ -14,7 +14,7 @@ module UnreadMongoid
       has_many :read_marks, as: :readable, dependent: :destroy
 
       before_save do |readable|
-        readable.read_marks.delete_all
+        readable.mark_as_unread!
       end
 
       include Readable::InstanceMethods
