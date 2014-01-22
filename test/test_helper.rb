@@ -7,7 +7,7 @@ Mongoid.load!(File.dirname(__FILE__) + '/mongoid.yml')
 
 require 'unread_mongoid'
 
-class Reader
+class User
   include Mongoid::Document
   include UnreadMongoid
 
@@ -22,7 +22,7 @@ class Email
 
   include UnreadMongoid
 
-  acts_as_readable :on => :updated_at
+  acts_as_readable
 
   field :subject, type: String
   field :content, type: String

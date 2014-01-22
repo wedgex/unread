@@ -1,45 +1,25 @@
 module UnreadMongoid
   module Readable
     module Scopes
-      # TODO rename some of these
+      def unread_by(reader)
+        UnreadMongoid::Reader.assert_reader(reader)
 
-      def unread_by(user)
-        self.not_in(_id: read_ids(user))
+        self.not_in(id: read_ids(reader))
       end
 
-      def read_by(user)
-        self.in(_id: read_ids(user))
+      def read_by(reader)
+        UnreadMongoid::Reader.assert_reader(reader)
+
+        self.in(id: read_ids(reader))
       end
 
       private
-      def read_marks_query(user)
-        assert_reader(user)
-
-        ReadMark.where(readable_type: self.name, user_id: user._id)
-      end
-
-      def blanket_marks_query(user)
-        read_marks_query(user).and(readable_id: nil).sort(timestamp: :desc)
-      end
-
-      def read_ids(user)
-        specifically_marked_ids(user) + blanketed_ids(user)
-      end
-
-      def blanketed_ids(user)
-        blanket = blanket_marks_query(user).first
-
-        if blanket
-          self.lte(self.readable_options[:on] => blanket.timestamp).only(:_id).map(&:_id)
-        else
-          []
-        end
-      end
-
-      def specifically_marked_ids(user)
-        read_marks_query(user).ne(readable_id: nil).select do |read_mark|
-          read_mark.timestamp.to_i >= read_mark.readable.send(self.readable_options[:on]).to_i
-        end.map(&:readable_id)
+      def read_ids(reader)
+        ReadMark.where(
+          reader_id: reader.id,
+          reader_type: reader.class.name,
+          readable_type: self.name
+        ).only(:readable_id).map(&:readable_id)
       end
     end
   end
